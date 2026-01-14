@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Santaman</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="game.css" />
+  </head>
+
+  <body>
+    <main class="container">
+      <!-- ~~~~~~~~~~~~~~~~~~ MAIN MENU VIEW ~~~~~~~~~~~~~~~~~~ -->
+      <section id="view-main-menu">
+        <header class="hero">
+          <h1>Santaman</h1>
+          <p class="tagline">Multiplayer tile-based mayhem</p>
+        </header>
+        <nav class="actions" aria-label="Main actions">
+          <button id="btn-show-host" class="btn">Host Game</button>
+          <button id="btn-show-join" class="btn">Join Game</button>
+          <button id="btn-show-local" class="btn">Local Game</button>
+          <a class="btn" href="instructions.html">Instructions</a>
+        </nav>
+        <section id="open-games-section" class="open-games" hidden>
+          <h3>Open Games (click to join)</h3>
+          <table id="open-games-table">
+            <thead>
+              <tr>
+                <th>Room ID</th>
+                <th># Players</th>
+                <th>Players</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- rows will be injected by app.js -->
+            </tbody>
+          </table>
+          <p id="no-open-games" class="message" hidden>No open games at the moment.</p>
+        </section>
+      </section>
+
+      <!-- ~~~~~~~~~~~~~~~~~~ HOST GAME VIEW ~~~~~~~~~~~~~~~~~~ -->
+      <section id="view-host-game" hidden>
+        <header class="page-header">
+          <h1>Santaman</h1>
+          <h2>Host Game</h2>
+        </header>
+        <div class="card host-card">
+          <form id="hostForm" autocomplete="off" novalidate>
+            <div class="form-row">
+              <label for="hostPlayerName">Player name</label>
+              <input
+                id="hostPlayerName"
+                name="playerName"
+                type="text"
+                required
+                maxlength="30"
+                placeholder="Enter your name"
+              />
+            </div>
+            <div class="form-actions">
+              <button id="hostBtn" type="submit">Host Game</button>
+              <button id="btn-host-back" type="button" class="button secondary">Back</button>
+            </div>
+            <div id="hostMessage" aria-live="polite" class="message" hidden></div>
+          </form>
+        </div>
+      </section>
+
+      <!-- ~~~~~~~~~~~~~~~~~~ LOCAL GAME SETUP VIEW ~~~~~~~~~~~~~~~~~~ -->
+      <section id="view-local-setup" hidden>
+        <header class="page-header">
+          <h1>Santaman</h1>
+          <h2>Local Game Setup</h2>
+        </header>
+        <div class="card split-layout">
+          <div class="setup-column">
+            <h3>Players</h3>
+            <form id="localSetupForm" autocomplete="off" novalidate>
+              <div class="form-row">
+                <label for="localP1Name">Player 1 Name</label>
+                <div style="display: flex; gap: 8px; align-items: center">
+                  <input
+                    id="localP1Name"
+                    name="p1Name"
+                    type="text"
+                    maxlength="15"
+                    placeholder="Player 1"
+                    value="Player 1"
+                    style="flex: 1"
+                  />
+                  <label
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 4px;
+                      color: var(--muted);
+                      font-size: 10px;
+                      cursor: pointer;
+                    "
+                  >
+                    <input
+                      type="checkbox"
+                      name="p1Computer"
+                      class="computer-checkbox"
+                      data-target="localP1Name"
+                    />
+                    Computer
+                  </label>
+                </div>
+              </div>
+              <!-- P1 Config -->
+              <div
+                id="config-p1"
+                class="bot-config"
+                style="margin-top: -10px; padding-left: 10px; font-size: 0.9em"
+                hidden
+              >
+                <label style="display: flex; align-items: center; margin-right: 10px">
+                  <input type="checkbox" name="p1Items" checked /> Use Items
+                </label>
+                <label style="display: flex; align-items: center; margin-right: 10px">
+                  <input type="checkbox" name="p1Smart" checked /> Smart
+                </label>
+                <label style="display: flex; align-items: center">
+                  Diff:
+                  <input
+                    type="number"
+                    name="p1Diff"
+                    value="5"
+                    min="1"
+                    max="10"
+                    style="width: 40px; margin-left: 5px"
+                  />
+                </label>
+              </div>
+              <div class="form-row">
+                <label for="localP2Name">Player 2 Name</label>
+                <div style="display: flex; gap: 8px; align-items: center">
+                  <input
+                    id="localP2Name"
+                    name="p2Name"
+                    type="text"
+                    maxlength="15"
+                    placeholder="Player 2"
+                    value="Player 2"
+                    style="flex: 1"
+                  />
+                  <label
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 4px;
+                      color: var(--muted);
+                      font-size: 10px;
+                      cursor: pointer;
+                    "
+                  >
+                    <input
+                      type="checkbox"
+                      name="p2Computer"
+                      class="computer-checkbox"
+                      data-target="localP2Name"
+                    />
+                    Computer
+                  </label>
+                </div>
+              </div>
+              <!-- P2 Config -->
+              <div
+                id="config-p2"
+                class="bot-config"
+                style="margin-top: -10px; padding-left: 10px; font-size: 0.9em"
+                hidden
+              >
+                <label style="display: inline-flex; align-items: center; margin-right: 10px">
+                  <input type="checkbox" name="p2Items" checked /> Use Items
+                </label>
+                <label style="display: inline-flex; align-items: center; margin-right: 10px">
+                  <input type="checkbox" name="p2Smart" checked /> Smart
+                </label>
+                <label style="display: inline-flex; align-items: center">
+                  Diff:
+                  <input
+                    type="number"
+                    name="p2Diff"
+                    value="5"
+                    min="1"
+                    max="10"
+                    style="width: 40px; margin-left: 5px"
+                  />
+                </label>
+              </div>
+              <div class="form-row">
+                <label for="localP3Name">Player 3 Name (Optional)</label>
+                <div style="display: flex; gap: 8px; align-items: center">
+                  <input
+                    id="localP3Name"
+                    name="p3Name"
+                    type="text"
+                    maxlength="15"
+                    placeholder="Player 3"
+                    style="flex: 1"
+                  />
+                  <label
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 4px;
+                      color: var(--muted);
+                      font-size: 10px;
+                      cursor: pointer;
+                    "
+                  >
+                    <input
+                      type="checkbox"
+                      name="p3Computer"
+                      class="computer-checkbox"
+                      data-target="localP3Name"
+                    />
+                    Computer
+                  </label>
+                </div>
+              </div>
+              <!-- P3 Config -->
+              <div
+                id="config-p3"
+                class="bot-config"
+                style="margin-top: -10px; padding-left: 10px; font-size: 0.9em"
+                hidden
+              >
+                <label style="display: inline-flex; align-items: center; margin-right: 10px">
+                  <input type="checkbox" name="p3Items" checked /> Use Items
+                </label>
+                <label style="display: inline-flex; align-items: center; margin-right: 10px">
+                  <input type="checkbox" name="p3Smart" checked /> Smart
+                </label>
+                <label style="display: inline-flex; align-items: center">
+                  Diff:
+                  <input
+                    type="number"
+                    name="p3Diff"
+                    value="5"
+                    min="1"
+                    max="10"
+                    style="width: 40px; margin-left: 5px"
+                  />
+                </label>
+              </div>
+              <div class="form-row">
+                <label for="localP4Name">Player 4 Name (Optional)</label>
+                <div style="display: flex; gap: 8px; align-items: center">
+                  <input
+                    id="localP4Name"
+                    name="p4Name"
+                    type="text"
+                    maxlength="15"
+                    placeholder="Player 4"
+                    style="flex: 1"
+                  />
+                  <label
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 4px;
+                      color: var(--muted);
+                      font-size: 10px;
+                      cursor: pointer;
+                    "
+                  >
+                    <input
+                      type="checkbox"
+                      name="p4Computer"
+                      class="computer-checkbox"
+                      data-target="localP4Name"
+                    />
+                    Computer
+                  </label>
+                </div>
+              </div>
+              <!-- P4 Config -->
+              <div
+                id="config-p4"
+                class="bot-config"
+                style="margin-top: -10px; padding-left: 10px; font-size: 0.9em"
+                hidden
+              >
+                <label style="display: inline-flex; align-items: center; margin-right: 10px">
+                  <input type="checkbox" name="p4Items" checked /> Use Items
+                </label>
+                <label style="display: inline-flex; align-items: center; margin-right: 10px">
+                  <input type="checkbox" name="p4Smart" checked /> Smart
+                </label>
+                <label style="display: inline-flex; align-items: center">
+                  Diff:
+                  <input
+                    type="number"
+                    name="p4Diff"
+                    value="5"
+                    min="1"
+                    max="10"
+                    style="width: 40px; margin-left: 5px"
+                  />
+                </label>
+              </div>
+
+              <div class="form-actions">
+                <button id="btn-start-local" type="submit">Start Game</button>
+                <button id="btn-local-back" type="button" class="button secondary">Back</button>
+              </div>
+              <div id="localMessage" aria-live="polite" class="message" hidden></div>
+            </form>
+          </div>
+          <div class="setup-column controls-column">
+            <h3>Controls</h3>
+            <div id="controls-list">
+              <!-- Controls will be injected here -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ~~~~~~~~~~~~~~~~~~ JOIN GAME VIEW ~~~~~~~~~~~~~~~~~~ -->
+      <section id="view-join-game" hidden>
+        <header class="page-header">
+          <h1>PPC Bomberman</h1>
+          <h2>Join Game</h2>
+        </header>
+        <div class="card">
+          <form id="joinForm" autocomplete="off" novalidate>
+            <div class="form-row">
+              <label for="joinPlayerName">Player name</label>
+              <input
+                id="joinPlayerName"
+                name="playerName"
+                type="text"
+                required
+                maxlength="30"
+                placeholder="Enter your name"
+              />
+            </div>
+            <div class="form-row">
+              <label for="joinRoomId">Room ID</label>
+              <input
+                id="joinRoomId"
+                name="roomId"
+                type="text"
+                required
+                maxlength="6"
+                placeholder="Enter room ID"
+              />
+            </div>
+            <div class="form-actions">
+              <button id="joinBtn" type="submit">Join Game</button>
+              <button id="btn-join-back" type="button" class="button secondary">Back</button>
+            </div>
+            <div id="joinMessage" aria-live="polite" class="message" hidden></div>
+          </form>
+        </div>
+      </section>
+
+      <!-- ~~~~~~~~~~~~~~~~~~ LOBBY VIEW ~~~~~~~~~~~~~~~~~~ -->
+      <section id="view-lobby" hidden>
+        <header class="page-header">
+          <h1>PPC Bomberman</h1>
+          <h2>Lobby</h2>
+        </header>
+        <div class="card split-layout">
+          <div class="setup-column">
+            <div class="lobby-info">
+              <h3>Room ID: <span id="lobby-room-id" class="glow"></span></h3>
+              <p>Waiting for other players... Share the Room ID with your friends!</p>
+            </div>
+            <h4>Players</h4>
+            <ul id="lobby-player-list">
+              <!-- Player items will be injected by app.js -->
+            </ul>
+            <div id="lobby-message" aria-live="polite" class="message" hidden></div>
+            <div class="form-actions">
+              <button id="btn-start-game" class="btn-primary" hidden>Start Game</button>
+              <button id="btn-leave-lobby" class="button secondary">Leave Lobby</button>
+            </div>
+          </div>
+          <div class="setup-column controls-column">
+            <h3>Controls</h3>
+            <div id="controls-list">
+              <span>Move:</span>
+              <span class="arrow-key">⬆</span>
+              <span class="arrow-key">⬇</span>
+              <span class="arrow-key">⬅</span>
+              <span class="arrow-key">➡</span>
+              <span>Bomb:</span><span>Space</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ~~~~~~~~~~~~~~~~~~ GAME VIEW ~~~~~~~~~~~~~~~~~~ -->
+      <section id="view-game" hidden>
+        <div id="ui-layer">
+          <div class="scoreboard-container">
+            <div id="scoreboard">
+              <div id="score-p1" class="score-card" style="color: #e74c3c">P1: 0</div>
+              <div id="score-p2" class="score-card" style="color: #3498db">P2: 0</div>
+              <div id="score-p3" class="score-card" style="color: #2ecc71">P3: 0</div>
+              <div id="score-p4" class="score-card" style="color: #f1c40f">P4: 0</div>
+            </div>
+            <div id="player-stats" hidden>
+              <span class="stat-item stat-range">🔥: <span id="stat-range-value">2</span></span>
+              <span class="stat-item stat-speed">👟: <span id="stat-speed-value">250</span></span>
+              <span class="stat-item stat-bombs">💣: <span id="stat-bombs-value">1</span></span>
+            </div>
+          </div>
+          <div id="game-timer">00:00</div>
+        </div>
+
+        <div id="game-container">
+          <div id="victory-message">
+            <h1 id="victory-text">PLAYER 1 WINS!</h1>
+            <button id="reset-btn">PLAY AGAIN</button>
+          </div>
+        </div>
+        <!-- Music toggle – placed in the top‑right corner of the game view -->
+        <button
+          id="music-toggle"
+          class="button"
+          data-state="off"
+          style="
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 2000;
+            font-size: 10px;
+            padding: 6px 10px;
+          "
+        >
+          🎵 Music: Off
+        </button>
+      </section>
+    </main>
+    <div id="pause-overlay" hidden>
+      <span class="pause-text">PAUSED – press Esc to resume</span>
+      <button id="quit-btn" class="button secondary">Quit</button>
+    </div>
+
+    <!-- Debug Terminal (Left Side) -->
+    <div
+      id="debug-terminal"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 300px;
+        background: rgba(0, 0, 0, 0.85);
+        color: #00ff00;
+        font-family: monospace;
+        font-size: 12px;
+        overflow-y: auto;
+        padding: 10px;
+        z-index: 9999;
+        border-right: 2px solid #00ff00;
+      "
+    >
+      <div style="border-bottom: 1px solid #00ff00; margin-bottom: 5px; font-weight: bold">
+        DEBUG TERMINAL
+      </div>
+      <div id="debug-content"></div>
+    </div>
+
+    <footer class="site-footer" role="contentinfo">© Santaman</footer>
+
+    <!-- Socket.IO Client Library -->
+    <script src="socket.io/socket.io.js"></script>
+    <script type="module" src="./js/app.js"></script>
+
+    <audio
+      id="bg-music"
+      src="./assets/sound/jinglebells.mp3"
+      preload="auto"
+      loop
+      crossorigin="anonymous"
+    ></audio>
+  </body>
+</html>

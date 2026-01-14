@@ -1,0 +1,378 @@
+/* Santaman — Retro / pixel-art inspired styles */
+
+/* Import a retro pixel font (Press Start 2P). If offline, monospace fallback will be used. */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+:root {
+  --bg: #071226; /* deep navy */
+  --panel: #0e2136; /* slightly lighter panel */
+  --accent-1: #00f5ff; /* neon cyan */
+  --accent-2: #ff2d95; /* neon magenta */
+  --accent-3: #ffd400; /* neon yellow */
+  --muted: #8fb0c6;
+  --glass: rgba(255, 255, 255, 0.04);
+  --pixel-border: 6px;
+}
+
+/* Base */
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  min-height: 100%;
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  background:
+    radial-gradient(1200px 600px at 10% 10%, rgba(0, 245, 255, 0.04), transparent 8%),
+    radial-gradient(1000px 400px at 90% 90%, rgba(255, 45, 149, 0.03), transparent 10%), var(--bg);
+  color: #e6f7ff;
+  -webkit-font-smoothing: none; /* keep pixel edges */
+  text-rendering: geometricPrecision;
+  padding: 32px;
+  letter-spacing: 0.5px;
+}
+
+/* Layout containers */
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+/* Header / Hero */
+.page-header,
+.hero {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.hero h1,
+.page-header h1 {
+  margin: 6px 0;
+  font-size: 28px;
+  color: var(--accent-1);
+  text-shadow:
+    0 0 8px rgba(0, 245, 255, 0.18),
+    0 0 18px rgba(0, 245, 255, 0.06);
+}
+
+.page-header h2,
+.subtitle {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+  text-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
+}
+
+/* Card */
+.card {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.06));
+  border: var(--pixel-border) solid #0b2a3e;
+  border-radius: 6px;
+  padding: 18px;
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.6),
+    0 0 20px rgba(0, 245, 255, 0.02) inset;
+}
+
+.split-layout {
+  display: flex;
+  gap: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.setup-column {
+  flex: 1;
+}
+
+.controls-column {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #0b2a3e;
+}
+
+.controls-column h3,
+.setup-column h3 {
+  margin-top: 0;
+  color: var(--accent-1);
+  font-size: 14px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.control-group {
+  margin-bottom: 15px;
+  font-size: 10px;
+}
+
+.control-group h4 {
+  margin: 0 0 5px 0;
+  color: var(--accent-3);
+}
+
+.control-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2px;
+  color: #ccc;
+  line-height: 14px;
+}
+
+@media (max-width: 640px) {
+  .split-layout {
+    flex-direction: column;
+  }
+}
+
+.arrow-key {
+  font-family: sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+  display: inline-block;
+}
+
+/* Form */
+form {
+  max-width: 640px;
+  margin: 0 auto;
+}
+.form-row {
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+label {
+  font-size: 10px;
+  color: var(--muted);
+}
+input[type='text'],
+input[type='password'],
+.toast input {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+  border: 4px solid #062433;
+  padding: 10px 12px;
+  color: #e8fbff;
+  border-radius: 4px;
+  outline: none;
+  font-family: inherit;
+  font-size: 11px;
+  box-shadow:
+    0 6px 12px rgba(0, 0, 0, 0.6),
+    0 0 12px rgba(0, 245, 255, 0.02) inset;
+  -webkit-font-smoothing: none;
+}
+
+input::placeholder {
+  color: rgba(230, 247, 255, 0.35);
+  font-family: inherit;
+  font-size: 10px;
+}
+input:focus {
+  border-color: var(--accent-1);
+  box-shadow:
+    0 0 18px rgba(0, 245, 255, 0.08),
+    0 6px 18px rgba(0, 0, 0, 0.6);
+}
+
+/* Buttons */
+.button,
+.btn,
+button {
+  display: inline-block;
+  text-decoration: none;
+  cursor: pointer;
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: 0;
+  font-size: 11px;
+  color: #071226;
+  background: linear-gradient(180deg, var(--accent-3), #f0b400);
+  box-shadow:
+    0 6px 0 #b07d00,
+    0 12px 30px rgba(255, 208, 80, 0.06);
+  transition:
+    transform 0.08s ease,
+    box-shadow 0.08s ease;
+  font-family: inherit;
+  -webkit-font-smoothing: none;
+  user-select: none;
+  letter-spacing: 0.6px;
+}
+
+.button.secondary,
+.btn-secondary {
+  background: linear-gradient(180deg, #9aa9b4, #6f8995);
+  color: #071226;
+  box-shadow: 0 6px 0 #3f5963;
+}
+
+.btn-primary,
+#hostBtn {
+  background: linear-gradient(180deg, var(--accent-1), #00bcd7);
+  color: #02121a;
+  box-shadow: 0 6px 0 #007a88;
+}
+
+button:active,
+.button:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.6);
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  margin: 18px 0;
+  flex-wrap: wrap;
+}
+
+/* Form actions */
+.form-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+/* Message */
+.message {
+  margin-top: 12px;
+  padding: 10px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.04));
+  color: var(--accent-3);
+  border: 3px solid rgba(255, 212, 64, 0.06);
+}
+.message.error {
+  color: var(--accent-2);
+  border-color: rgba(255, 45, 149, 0.2);
+}
+
+/* Accessibility helpers */
+.visually-hidden {
+  position: absolute !important;
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  white-space: nowrap;
+}
+
+/* Footer */
+.site-footer {
+  text-align: center;
+  margin-top: 40px;
+  color: #3d5968;
+  font-size: 11px;
+}
+
+/* Small screens */
+@media (max-width: 640px) {
+  body {
+    padding: 18px;
+  }
+  .form-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .button,
+  .btn,
+  button {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* Tiny pixel accent decorations (optional) */
+.glow {
+  text-shadow:
+    0 0 6px rgba(0, 245, 255, 0.7),
+    0 0 14px rgba(0, 245, 255, 0.25),
+    0 0 28px rgba(0, 245, 255, 0.12);
+}
+
+/* ensure focus outlines are visible for keyboard users */
+:focus {
+  outline: 3px dashed rgba(255, 255, 255, 0.06);
+  outline-offset: 5px;
+}
+
+/* -----------------------------------------------------------------
+   Pause overlay – covers the entire game area while keeping UI
+   accessible when hidden (via the `hidden` attribute)
+   ----------------------------------------------------------------- */
+#pause-overlay {
+  position: fixed; /* stay on top even if the page scrolls */
+  inset: 0; /* top/right/bottom/left = 0 → full screen */
+  background: rgba(0, 0, 0, 0.65); /* semi‑transparent dark backdrop */
+  display: flex; /* flexbox centers the child */
+  align-items: center;
+  justify-content: center;
+  z-index: 9999; /* above everything else */
+  pointer-events: auto;
+  flex-direction: column; /* stack children vertically */
+  gap: 1.2rem; /* space between text and button */
+  padding: 2rem; /* give the container some interior height */
+}
+
+#pause-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  pointer-events: none; /* background stays click‑through */
+}
+
+#pause-overlay button {
+  pointer-events: auto; /* explicitly enable the button */
+}
+
+#pause-overlay[hidden] {
+  display: none; /* removes it from layout & painting */
+  pointer-events: none; /* let clicks reach the game underneath */
+}
+
+/* Text inside the overlay – big, bright, pixel‑style */
+#pause-overlay .pause-text {
+  font-size: 2.2rem; /* large enough to read */
+  color: #fff;
+  text-shadow:
+    0 0 6px rgba(255, 255, 255, 0.8),
+    0 0 12px rgba(255, 255, 255, 0.4);
+  font-family: 'Press Start 2P', monospace;
+  letter-spacing: 0.5px;
+}
+
+/* Utility to force hide elements */
+[hidden] {
+  display: none !important;
+}
+
+/* Bot Config styling */
+.bot-config {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: -5px;
+  margin-bottom: 10px;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+/* Instructions specific spacing */
+.instructions-card ol,
+.instructions-card p {
+  line-height: 1.8;
+  margin-bottom: 16px;
+}
