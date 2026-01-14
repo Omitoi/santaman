@@ -21,7 +21,7 @@
 
 Whether you're playing locally with friends or hosting a server for a festive showdown, the goal is simple: **Be the last Santa standing!**
 
-**[Play Online Demo (Placeholder)](https://santaman-demo.example.com)**
+**[Play Online Demo (Placeholder)](https://santaman.onrender.com)**
 
 ## Features
 
