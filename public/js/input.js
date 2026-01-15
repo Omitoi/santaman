@@ -43,6 +43,11 @@ export default class InputManager {
       return;
     }
 
+    // Prevent default scrolling for arrows/space
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) {
+      e.preventDefault();
+    }
+
     // Add to stack if not already there
     if (!this.keys.includes(action)) {
       this.keys.push(action);

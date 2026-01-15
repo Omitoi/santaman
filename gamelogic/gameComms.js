@@ -18,7 +18,9 @@ export default class GameComms {
       throw new TypeError('usernames must be an array with at least one username');
     }
 
+    this.#emit = emit;
     this.#isPaused = isPaused;
+    this.#usernames = usernames;
 
     this.#gameEngine = new GameEngine({
       eventHandler: (...args) => {

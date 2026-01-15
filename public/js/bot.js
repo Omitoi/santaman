@@ -1,4 +1,4 @@
-import { TILE_SIZE, PLAYER_SIZE } from './constants.js';
+import { TILE_SIZE, PLAYER_SIZE, BOMB_COOLDOWN } from './constants.js';
 import { logger } from './logger.js';
 
 // Bot Modes
@@ -25,6 +25,7 @@ export default class Bot {
     this.placeReady = false;
 
     this.config = config || { useItems: true, smart: true, difficulty: 5 };
+    logger.debug(`[Bot ${this.id}] Initialized. Config: ${JSON.stringify(this.config)}`);
     this.logicUpdateInterval = Math.floor(500 - (this.config.difficulty - 1) * (400 / 9));
     this.lastLogicTime = 0;
 
@@ -41,7 +42,7 @@ export default class Bot {
 
   update(state) {
     const player = state.players[this.id];
-    if (!player || player.isDead) return { dx: 0, dy: 0, placeBomb: false };
+    if (!player || player.isDead || state.isGameOver) return { dx: 0, dy: 0, placeBomb: false };
 
     const myCol = Math.floor((player.x + PLAYER_SIZE / 2) / TILE_SIZE);
     const myRow = Math.floor((player.y + PLAYER_SIZE / 2) / TILE_SIZE);
@@ -213,21 +214,30 @@ export default class Bot {
       // Smart Check: Do we have impact from here?
       const impact = this.calcImpact(col, row, player.stats.bombRange, state.mapLayout);
       const hitsP = this.hitsPlayer(col, row, player.stats.bombRange, state);
-      if (impact > 0 || hitsP) shouldBomb = true;
+      if (hitsP || (this.targetPath.length === 0 && impact > 0)) shouldBomb = true;
     } else {
       // Basic Check: Adjacency
       if (this.isNearTarget(col, row, state)) shouldBomb = true;
     }
 
     if (shouldBomb) {
-      if (this.isSafeToPlace(col, row, player.stats.bombRange)) {
-        this.placeReady = true;
-        this.changeMode(MODE_IDLE); // Go to IDLE to execute placement next frame
-      } else {
-        // Unsafe target, retry or wait
-        logger.debug(`[Bot ${this.id}] Target reached but UNSAFE to place bomb.`);
-        this.changeMode(MODE_IDLE);
-      }
+        if (this.isSafeToPlace(col, row, player.stats.bombRange)) {
+            this.placeReady = true;
+            this.changeMode(MODE_IDLE); // Go to IDLE to execute placement next frame
+        } else {
+            // Unsafe target.
+            // If we are boxed in by TEMPORARY danger (blocked by blasts or other bombs), we should WAIT.
+            // If we are boxed in by PERMANENT walls/crates, waiting won't help (unless we are stuck forever).
+            if (this.isBlockedByDanger(col, row, state)) {
+                // Stay in ATTACK mode (Wait)
+                // logger.debug(`[Bot ${this.id}] Boxed in by danger. Waiting...`);
+                return;
+            }
+
+            // Otherwise, give up and find a new target
+            logger.debug(`[Bot ${this.id}] Target reached but UNSAFE to place bomb.`);
+            this.changeMode(MODE_IDLE);
+        }
     }
   }
 
@@ -279,7 +289,12 @@ export default class Bot {
 
   canPlaceBomb(player, state) {
     const active = state.activeBombs.filter((b) => b.ownerId === this.id).length;
-    return active < player.stats.maxBombs;
+    if (active >= player.stats.maxBombs) return false;
+    // Check cooldown to avoid spamming and getting stuck in placement loop
+    const now = Date.now();
+    if (now - player.lastBombTime < BOMB_COOLDOWN) return false;
+
+    return true;
   }
 
   refreshMaps(state) {
@@ -491,11 +506,37 @@ export default class Bot {
       if (!this.isSafeToPlace(t.col, t.row, range)) continue;
 
       const openNeighbors = this.countOpenNeighbors(t.col, t.row, state.mapLayout);
+      let penalty = 0;
+      
+      // 3. Item Preservation Check
+      if (this.config.useItems) {
+         const destroyedItems = this.calcItemLoss(t.col, t.row, range, state.mapLayout);
+         penalty += destroyedItems * 50; // Big penalty for destroying items
+      }
 
-      // Score: Impact (high), Openness (medium), Distance (penalty)
-      // Hitting a player is very high value (equivalent to 5 crates)
-      const baseScore = impact * 20 + (hitsP ? 100 : 0);
-      const score = baseScore + openNeighbors * 5 - t.dist;
+      // Score: Impact (very high), Openness (low), Distance (penalty)
+      // Hitting a player is critical (100)
+      // Hitting a crate is high (30)
+      // Open neighbors are minor convenience (1)
+      const baseScore = impact * 30 + (hitsP ? 100 : 0);
+      const score = baseScore + openNeighbors - t.dist * 5 - penalty;
+
+      // Debug significant candidates
+      if (score > 20) {
+          logger.debug(`[Bot ${this.id}] [Loc:${col},${row}] Candidate (${t.col},${t.row}) Score: ${score} (Imp:${impact} Pen:${penalty} Dist:${t.dist})`);
+          if (impact > 0) {
+             // scan neighbors
+             const neighbors = [];
+             for(const d of DIRECTIONS) {
+                 const nr = t.row + d.dy;
+                 const nc = t.col + d.dx;
+                 if (nr>=0 && nr<this.rows && nc>=0 && nc<this.cols) {
+                     neighbors.push(`(${nc},${nr})=${state.mapLayout[nr][nc]}`);
+                 }
+             }
+             logger.debug(`[Bot ${this.id}]   Impact Source? Neighbors: ${neighbors.join(', ')}`);
+          }
+      }
 
       if (!best || score > best.score) best = { ...t, score };
     }
@@ -526,6 +567,33 @@ export default class Bot {
       }
     }
     return null;
+  }
+
+  isBlockedByDanger(col, row, state) {
+    let safeMoves = 0;
+    let blockedByDanger = false;
+
+    for (const d of DIRECTIONS) {
+      const nc = col + d.dx;
+      const nr = row + d.dy;
+      if (nc >= 0 && nc < this.cols && nr >= 0 && nr < this.rows) {
+        const isSolid = this.solidMap[nr][nc];
+        const isDanger = this.dangerMap[nr][nc];
+        const isBomb = state.activeBombs.some(b => b.col === nc && b.row === nr);
+        
+        if (!isSolid && !isDanger) {
+            safeMoves++;
+        }
+
+        // If blocked by danger (blast) or a bomb (solid but temporary), it's waitable
+        if (isDanger || isBomb) {
+            blockedByDanger = true;
+        }
+      }
+    }
+
+    // We are "Blocked By Danger" if we have NO safe moves, AND at least one blockage is temporary.
+    return safeMoves === 0 && blockedByDanger;
   }
 
   isNearTarget(col, row, state) {
@@ -564,6 +632,24 @@ export default class Bot {
       }
     }
     return crates;
+  }
+
+  calcItemLoss(col, row, range, layout) {
+    let lost = 0;
+    for (const d of DIRECTIONS) {
+      for (let i = 1; i <= range; i++) {
+        const r = row + d.dy * i;
+        const c = col + d.dx * i;
+        if (r < 0 || r >= this.rows || c < 0 || c >= this.cols) break;
+        if (layout[r][c] === 1) break; // Wall
+        if (layout[r][c] === 2) break;
+
+        // Check if there is an active item here
+        const itemType = this.itemMap[r][c];
+        if (itemType && itemType !== 'death') lost++;
+      }
+    }
+    return lost;
   }
 
   hitsPlayer(col, row, range, state) {

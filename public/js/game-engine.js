@@ -64,7 +64,7 @@ export default class GameEngine {
     });
   }
 
-  addPlayers(playerConfigs) {
+  addPlayers(playerConfigs = []) {
     // defined Order: TL, BR, TR, BL
     const SPAWN_POSITIONS = [
       { col: 1, row: 1 }, // 1st Player (Index 0)
@@ -178,7 +178,9 @@ export default class GameEngine {
           y: 0,
         });
 
-        this.explodeBomb(bomb);
+        if (now >= bomb.explodeAt) {
+          this.explodeBomb(bomb);
+        }
       }
     }
   }
@@ -401,6 +403,7 @@ export default class GameEngine {
         const tileType = this.mapLayout[targetRow][targetCol];
         if (tileType === 1) break;
         else if (tileType === 2) {
+          logger.debug(`[BOMB DEBUG] Found crate at (${targetCol}, ${targetRow}). Destroying.`);
           this.destroyCrate(targetCol, targetRow);
           this.checkPlayerHit(targetCol, targetRow);
           break;
