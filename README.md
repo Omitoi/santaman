@@ -21,7 +21,7 @@
 
 Whether you're playing locally with friends or hosting a server for a festive showdown, the goal is simple: **Be the last Santa standing!**
 
-**[Play Online Demo](https://santaman.onrender.com)**
+**[Play Online Demo](https://santaman.onrender.com/)**
 
 ## Features
 
@@ -94,7 +94,7 @@ Whether you're playing locally with friends or hosting a server for a festive sh
 
 1.  **Clone the Repository**
     ```bash
-    git clone https://github.com/Omitoi/santaman.git
+    git clone https://gitea.kood.tech/petrkubec/npc.git santaman
     cd santaman
     ```
 
@@ -137,6 +137,14 @@ We welcome elves of all skill levels to help build Santaman!
 5.  **Push** to your branch and open a **Pull Request**.
 
 Please ensure your code follows the festive style guide (run `npm run lint` before submitting!).
+
+---
+
+## Authors
+
+*   **Petr Kubec**
+*   **Pauno Komulainen**
+*   **Christian Asseburg**
 
 ---
 
